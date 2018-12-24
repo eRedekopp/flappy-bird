@@ -8,7 +8,7 @@ Development plan for Flappy Bird project
 
 ## Iterations
 
-### Phase 1
+### Phase 1: Complete
 
 A window is opened, and a yellow dot sits on the ground in the centre
 of the screen

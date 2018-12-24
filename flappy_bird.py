@@ -23,14 +23,14 @@ pygame.display.set_caption("Flappy Bird")
 # set up screen
 screen = pygame.display.set_mode(screen_size)
 
-background = pygame.Surface(screen_size)   # background
+background = pygame.Surface(screen_size).convert()   # background
 background.fill(blue)
-floor = pygame.Surface((screen_width, ground_height))
+floor = pygame.Surface((screen_width, ground_height)).convert()
 floor.fill(grey)
 background.blit(floor, (0, screen_height-ground_height))
 screen.blit(background, (0, 0))
 
-foreground = pygame.Surface(screen_size)   # foreground
+foreground = pygame.Surface(screen_size).convert()   # foreground
 foreground.set_colorkey((0, 0, 0))
 
 while True:  # keep drawing the same picture over and over

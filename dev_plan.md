@@ -13,7 +13,7 @@ Development plan for Flappy Bird project
 A window is opened, and a yellow dot sits on the ground in the centre
 of the screen
 
-### Phase 2
+### Phase 2: Complete
 
 The yellow dot changes colour when the user presses the space bar
 

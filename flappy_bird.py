@@ -13,6 +13,7 @@ SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 400, 600
 GRAVITY = 3
 JUMP_ACCEL = -40
 MAX_Y_VELOCITY = 12
+FRAME_RATE = 60
 
 # colours
 WHITE  = 255, 255, 255
@@ -51,6 +52,7 @@ foreground.set_colorkey(BLACK)
 
 mainloop = True
 bird_y_velocity = GRAVITY
+clock = pygame.time.Clock()
 while mainloop:
     # handle events
     for event in pygame.event.get():
@@ -64,13 +66,14 @@ while mainloop:
     if bird_y >= GROUND_LEVEL - BIRD_RADIUS and bird_y_velocity > 0:
         bird_y_velocity = 0
         bird_y = GROUND_LEVEL - BIRD_RADIUS
+
     elif bird_y_velocity < MAX_Y_VELOCITY \
      and bird_y < GROUND_LEVEL - BIRD_RADIUS:
         bird_y_velocity += GRAVITY
 
     bird_y += bird_y_velocity
 
-    # redraw
+    # redraw and update screen
     foreground.fill(BLACK)
     pygame.draw.circle(foreground,
                        BIRD_COLOUR,
@@ -79,5 +82,8 @@ while mainloop:
     screen.blit(background, (0, 0))
     screen.blit(foreground, (0, 0))
     pygame.display.flip()
+
+    # force frame rate
+    clock.tick(FRAME_RATE)
 
 

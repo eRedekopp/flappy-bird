@@ -3,52 +3,81 @@ Flappy Bird clone game
 """
 
 import pygame
-import random as rand
 
-# constants
-screen_size = screen_width, screen_height = 400, 600
-bird_initial_position = 200, 550
-bird_radius = 10    # the radius of the circle representing the bird
-ground_height = screen_height - (bird_initial_position[1] + bird_radius)
-ground_level = screen_height - ground_height # the position of the top of the
+################################## Constants ###################################
+
+# screen
+SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 400, 600
+
+# physics
+GRAVITY = 3
+JUMP_ACCEL = -40
+MAX_Y_VELOCITY = 12
+
+# colours
+WHITE  = 255, 255, 255
+BLACK  = 0, 0, 0
+BLUE   = 115, 233, 251
+YELLOW = 233, 244, 14
+GREY   = 100, 100, 100
+
+# graphics
+BIRD_INITIAL_POSITION = bird_x, bird_y= 200, 200
+BIRD_RADIUS = 10    # the radius of the circle representing the bird
+BIRD_COLOUR = YELLOW
+GROUND_HEIGHT = 30
+GROUND_LEVEL = SCREEN_HEIGHT - GROUND_HEIGHT # the position of the top of the
                                              # ground
-white  = 255, 255, 255
-blue   = 115, 233, 251
-yellow = 233, 244, 14
-grey   = 100, 100, 100
-bird_colour = yellow
+
+#################################### Setup #####################################
 
 # startup
 pygame.init()
 pygame.display.set_caption("Flappy Bird")
 
 # set up screen
-screen = pygame.display.set_mode(screen_size)
+screen = pygame.display.set_mode(SCREEN_SIZE)
 
-background = pygame.Surface(screen_size).convert()   # background
-background.fill(blue)
-floor = pygame.Surface((screen_width, ground_height)).convert()
-floor.fill(grey)
-background.blit(floor, (0, screen_height-ground_height))
-screen.blit(background, (0, 0))
+background = pygame.Surface(SCREEN_SIZE).convert()   # background
+background.fill(BLUE)
+floor = pygame.Surface((SCREEN_WIDTH, GROUND_HEIGHT)).convert()
+floor.fill(GREY)
+background.blit(floor, (0, GROUND_LEVEL))
 
-foreground = pygame.Surface(screen_size).convert()   # foreground
-foreground.set_colorkey((0, 0, 0))
+foreground = pygame.Surface(SCREEN_SIZE).convert()   # foreground
+foreground.set_colorkey(BLACK)
 
-while True:  # keep drawing the same picture over and over
+################################## Main Loop ###################################
+
+mainloop = True
+bird_y_velocity = GRAVITY
+while mainloop:
+    # handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
+            mainloop = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            # change bird to random colour when user presses space
-            bird_colour = rand.randint(0, 255), \
-                          rand.randint(0, 255), \
-                          rand.randint(0, 255)
+            bird_y_velocity += JUMP_ACCEL
+
+    # handle physics
+    if bird_y >= GROUND_LEVEL - BIRD_RADIUS and bird_y_velocity > 0:
+        bird_y_velocity = 0
+        bird_y = GROUND_LEVEL - BIRD_RADIUS
+    elif bird_y_velocity < MAX_Y_VELOCITY \
+     and bird_y < GROUND_LEVEL - BIRD_RADIUS:
+        bird_y_velocity += GRAVITY
+
+    bird_y += bird_y_velocity
+
+    # redraw
+    foreground.fill(BLACK)
     pygame.draw.circle(foreground,
-                       bird_colour,
-                       bird_initial_position,
-                       bird_radius)
+                       BIRD_COLOUR,
+                       (bird_x, bird_y),
+                       BIRD_RADIUS)
     screen.blit(background, (0, 0))
-    background.blit(foreground, (0, 0))
+    screen.blit(foreground, (0, 0))
     pygame.display.flip()
+
 

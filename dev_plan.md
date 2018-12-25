@@ -1,7 +1,7 @@
 
 Development plan for Flappy Bird project
 
-## Goal
+## Goals
 
 1. Implement a "Flappy Bird" clone with the pygame library
 2. Use machine learning to automatically play the game
@@ -19,8 +19,8 @@ The yellow dot changes colour when the user presses the space bar
 
 ### Phase 3
 
-The yellow dot jumps when the user presses the space bar and the dot no
-longer changes colour
+Add physics and jump when user presses space bar (no longer changes
+colour)
 
 ### Phase 4
 

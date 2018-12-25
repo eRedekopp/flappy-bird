@@ -17,13 +17,10 @@ of the screen
 
 The yellow dot changes colour when the user presses the space bar
 
-### Phase 3
+### Phase 3: Complete
 
 Add physics and jump when user presses space bar (no longer changes
 colour)
-
-Phase 3.1: force physics to conform to constant dt, add actual
-math-based physics
 
 ### Phase 4
 

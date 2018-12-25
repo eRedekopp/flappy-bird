@@ -10,10 +10,14 @@ import pygame
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 400, 600
 
 # physics
-GRAVITY = 3
-JUMP_ACCEL = -40
-MAX_Y_VELOCITY = 12
+METER   = 20 # number of pixels in one "meter"
+GRAVITY = 9.8
+JUMP_VELOCITY = -10
+MAX_Y_VELOCITY = 100
 FRAME_RATE = 60
+DT = 1/FRAME_RATE # time in seconds for one frame
+DV = GRAVITY * DT # dv = g * dt
+
 
 # colours
 WHITE  = 255, 255, 255
@@ -51,7 +55,7 @@ foreground.set_colorkey(BLACK)
 ################################## Main Loop ###################################
 
 mainloop = True
-bird_y_velocity = GRAVITY
+bird_y_velocity = 0
 clock = pygame.time.Clock()
 while mainloop:
     # handle events
@@ -60,18 +64,17 @@ while mainloop:
             pygame.quit()
             mainloop = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            bird_y_velocity += JUMP_ACCEL
+            bird_y_velocity = JUMP_VELOCITY
 
     # handle physics
     if bird_y >= GROUND_LEVEL - BIRD_RADIUS and bird_y_velocity > 0:
         bird_y_velocity = 0
         bird_y = GROUND_LEVEL - BIRD_RADIUS
-
-    elif bird_y_velocity < MAX_Y_VELOCITY \
-     and bird_y < GROUND_LEVEL - BIRD_RADIUS:
-        bird_y_velocity += GRAVITY
+    elif bird_y_velocity < MAX_Y_VELOCITY:
+        bird_y_velocity += DV
 
     bird_y += bird_y_velocity
+    bird_y  = int(bird_y)   # force integer
 
     # redraw and update screen
     foreground.fill(BLACK)

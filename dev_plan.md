@@ -22,6 +22,9 @@ The yellow dot changes colour when the user presses the space bar
 Add physics and jump when user presses space bar (no longer changes
 colour)
 
+Phase 3.1: force physics to conform to constant dt, add actual
+math-based physics
+
 ### Phase 4
 
 A green bar of random length is on the screen next to the dot, attached

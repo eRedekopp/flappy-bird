@@ -22,7 +22,7 @@ The yellow dot changes colour when the user presses the space bar
 Add physics and jump when user presses space bar (no longer changes
 colour)
 
-### Phase 4
+### Phase 4: Complete
 
 A green bar of random length is on the screen next to the dot, attached
 to the bottom of the screen

@@ -15,7 +15,7 @@ GRAVITY = 3.5
 JUMP_VELOCITY = -35
 MAX_Y_VELOCITY = 12
 FRAME_RATE = 60
-SCROLL_RATE = 30
+SCROLL_RATE = 10
 
 # colours
 WHITE  = 255, 255, 255
@@ -28,7 +28,7 @@ GREEN  = 40, 190, 40
 # graphics
 BAR_WIDTH      = 60
 BAR_GAP        = 120
-BAR_FREQUENCY  = 30
+BAR_FREQUENCY  = 20
 BAR_COLOUR     = GREEN
 BG_COLOUR      = BLUE
 MAX_BAR_LENGTH = 400
@@ -44,17 +44,19 @@ class BarPair:
     def generate_bar_pair():
         height = rand.randint(MIN_BAR_LENGTH, MAX_BAR_LENGTH)
         surface = pygame.Surface((BAR_WIDTH, GROUND_LEVEL))
-        bottom_bar = pygame.Surface((BAR_WIDTH, GROUND_LEVEL - height))
-        top_bar = pygame.Surface((BAR_WIDTH, GROUND_LEVEL - height - BAR_GAP))
+        top_bar = pygame.Surface((BAR_WIDTH, GROUND_LEVEL - BAR_GAP - height))
+        bottom_bar = pygame.Surface((BAR_WIDTH, height))
+
         bottom_bar.fill(BAR_COLOUR)
         top_bar.fill(BAR_COLOUR)
         surface.fill(BG_COLOUR)
+
         surface.blit(top_bar, (0, 0))
         surface.blit(bottom_bar, (0, GROUND_LEVEL - height))
         return surface
 
     def __init__(self):
-        self.__surface = self.generate_bar_pair()
+        self.__surface = BarPair.generate_bar_pair()
         self.__x_pos = SCREEN_WIDTH - BAR_WIDTH
 
     """
@@ -78,24 +80,36 @@ class BarPair:
 class BarList:
     def __init__(self):
         self.__list = []
-        self.__n_scrolls = 0
+        self.__list.append(BarPair())
+        self.__frames_since_last_pipe = 0
 
     def to_tuple(self):
         return tuple(self.__list)
 
     def addNewBar(self):
-        self.__list.append(BarPair())
+        new_bar_pair = BarPair()
+        self.__list.append(new_bar_pair)
+
+    """
+    Returns True if new bar is required, else false.
+    """
+    def req_new_bar(self):
+        if self.__frames_since_last_pipe == BAR_FREQUENCY:
+            self.__frames_since_last_pipe = 0
+            return True
+        else:
+            self.__frames_since_last_pipe += 1
+            return False
 
     def scroll(self):
-        if len(self.__list) == 0:
+        if self.req_new_bar():
             self.addNewBar()
         for pair in self.__list:
             pair.scroll()
         if self.__list[0].get_x() <= 0:
-            self.__list.pop()
-        if self.__n_scrolls % BAR_FREQUENCY == 0:
-            self.addNewBar()
-        self.__n_scrolls += 1
+            self.__list.pop(0)
+
+
 
 class Bird:
     def __init__(self):

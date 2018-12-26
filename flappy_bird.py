@@ -26,8 +26,6 @@ GREY   = 100, 100, 100
 GREEN  = 40, 190, 40
 
 # graphics
-BIRD_RADIUS    = 15     # the radius of the circle representing the bird
-BIRD_COLOUR    = YELLOW
 BAR_WIDTH      = 60
 BAR_GAP        = 120
 BAR_FREQUENCY  = 30
@@ -38,7 +36,6 @@ MIN_BAR_LENGTH = 150
 GROUND_HEIGHT  = 40
 GROUND_LEVEL   = SCREEN_HEIGHT - GROUND_HEIGHT # the position of the top of the
                                                # ground
-BIRD_INITIAL_POSITION = bird_x, bird_y= 200, GROUND_LEVEL - BIRD_RADIUS
 
 ################################### Classes ####################################
 
@@ -58,7 +55,7 @@ class BarPair:
 
     def __init__(self):
         self.__surface = self.generate_bar_pair()
-        self.__x_pos = SCREEN_WIDTH
+        self.__x_pos = SCREEN_WIDTH - BAR_WIDTH
 
     """
     Returns the x position of the bar pair
@@ -78,7 +75,7 @@ class BarPair:
     def scroll(self):
         self.__x_pos -= SCROLL_RATE
 
-class BarList():
+class BarList:
     def __init__(self):
         self.__list = []
         self.__n_scrolls = 0
@@ -99,6 +96,36 @@ class BarList():
         if self.__n_scrolls % BAR_FREQUENCY == 0:
             self.addNewBar()
         self.__n_scrolls += 1
+
+class Bird:
+    def __init__(self):
+        self.__x = 200
+        self.__y = 200
+        self.__y_velocity = GRAVITY
+        self.colour = YELLOW
+        self.radius = 15
+
+    """
+    Set y velocity to JUMP_VELOCITY
+    """
+    def jump(self):
+        self.__y_velocity = JUMP_VELOCITY
+
+    """
+    Adjust position and velocity for one frame
+    """
+    def next_frame(self):
+        if self.__y >= GROUND_LEVEL - self.radius and self.__y_velocity > 0:
+            self.__y_velocity = 0
+            self.__y = GROUND_LEVEL - self.radius
+        elif self.__y_velocity < MAX_Y_VELOCITY \
+                and self.__y < GROUND_LEVEL - self.radius:
+            self.__y_velocity += GRAVITY
+        self.__y += int(self.__y_velocity)
+
+    def get_pos(self):
+        return self.__x, self.__y
+
 
 #################################### Setup #####################################
 
@@ -121,9 +148,9 @@ foreground.set_colorkey(BLACK)
 ################################## Main Loop ###################################
 
 mainloop = True
-bird_y_velocity = GRAVITY
 clock = pygame.time.Clock()
 bars = BarList()
+bird = Bird()
 while mainloop:
     # handle events
     for event in pygame.event.get():
@@ -131,27 +158,23 @@ while mainloop:
             pygame.quit()
             mainloop = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            bird_y_velocity = JUMP_VELOCITY
+            bird.jump()
 
-    # handle physics
-    if bird_y >= GROUND_LEVEL - BIRD_RADIUS and bird_y_velocity > 0:
-        bird_y_velocity = 0
-        bird_y = GROUND_LEVEL - BIRD_RADIUS
-    elif bird_y_velocity < MAX_Y_VELOCITY \
-            and bird_y < GROUND_LEVEL - BIRD_RADIUS:
-        bird_y_velocity += GRAVITY
-    bird_y += int(bird_y_velocity)
+    # handle physics/graphics
+    bird.next_frame()
+    bars.scroll()
 
     # redraw foreground
     foreground.fill(BLACK)
-    bars.scroll()
     pygame.draw.circle(foreground,
-                       BIRD_COLOUR,
-                       (bird_x, bird_y),
-                       BIRD_RADIUS)
+                       bird.colour,
+                       bird.get_pos(),
+                       bird.radius)
+
     for pair in bars.to_tuple():
         foreground.blit(pair.get_surface(), (pair.get_x(), 0))
 
+    # update screen
     screen.blit(background, (0, 0))
     screen.blit(foreground, (0, 0))
     pygame.display.flip()

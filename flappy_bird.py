@@ -11,11 +11,11 @@ import random as rand
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 400, 600
 
 # physics
-GRAVITY = 3.5
-JUMP_VELOCITY = -35
+GRAVITY = 3.25
+JUMP_VELOCITY = -33
 MAX_Y_VELOCITY = 12
 FRAME_RATE = 60
-SCROLL_RATE = 10
+SCROLL_RATE = 7
 
 # colours
 WHITE  = 255, 255, 255
@@ -26,9 +26,9 @@ GREY   = 100, 100, 100
 GREEN  = 40, 190, 40
 
 # graphics
-BAR_WIDTH      = 60
-BAR_GAP        = 120
-BAR_FREQUENCY  = 20
+BAR_WIDTH      = 50
+BAR_GAP        = 140
+BAR_FREQUENCY  = 45    # lower = more frequent
 BAR_COLOUR     = GREEN
 BG_COLOUR      = BLUE
 MAX_BAR_LENGTH = 400
@@ -53,7 +53,7 @@ class BarPair:
 
         surface.blit(top_bar, (0, 0))
         surface.blit(bottom_bar, (0, GROUND_LEVEL - height))
-        return surface
+        return surface.convert()
 
     def __init__(self):
         self.__surface = BarPair.generate_bar_pair()
@@ -83,17 +83,21 @@ class BarList:
         self.__list.append(BarPair())
         self.__frames_since_last_pipe = 0
 
+    def n_bars(self):
+        return len(self.__list)
+
     def to_tuple(self):
         return tuple(self.__list)
 
-    def addNewBar(self):
+    def __addNewBar(self):
         new_bar_pair = BarPair()
         self.__list.append(new_bar_pair)
 
     """
     Returns True if new bar is required, else false.
+    Should only be called once per frame
     """
-    def req_new_bar(self):
+    def __req_new_bar(self):
         if self.__frames_since_last_pipe == BAR_FREQUENCY:
             self.__frames_since_last_pipe = 0
             return True
@@ -101,19 +105,21 @@ class BarList:
             self.__frames_since_last_pipe += 1
             return False
 
+    """
+    Scrolls all bars on the screen over by one frame, adds a new bar if 
+    necessary
+    """
     def scroll(self):
-        if self.req_new_bar():
-            self.addNewBar()
+        if self.__req_new_bar():
+            self.__addNewBar()
         for pair in self.__list:
             pair.scroll()
-        if self.__list[0].get_x() <= 0:
+        if self.n_bars() > 0 and self.__list[0].get_x() <= 0:
             self.__list.pop(0)
-
-
 
 class Bird:
     def __init__(self):
-        self.__x = 200
+        self.__x = 50
         self.__y = 200
         self.__y_velocity = GRAVITY
         self.colour = YELLOW
@@ -180,13 +186,12 @@ while mainloop:
 
     # redraw foreground
     foreground.fill(BLACK)
+    for pair in bars.to_tuple():
+        foreground.blit(pair.get_surface(), (pair.get_x(), 0))
     pygame.draw.circle(foreground,
                        bird.colour,
                        bird.get_pos(),
                        bird.radius)
-
-    for pair in bars.to_tuple():
-        foreground.blit(pair.get_surface(), (pair.get_x(), 0))
 
     # update screen
     screen.blit(background, (0, 0))

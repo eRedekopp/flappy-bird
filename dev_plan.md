@@ -27,12 +27,12 @@ colour)
 A green bar of random length is on the screen next to the dot, attached
 to the bottom of the screen
 
-### Phase 5
+### Phase 5: Complete
 
 The screen scrolls, generating new bars on the bottom of the screen as
 it goes
 
-### Phase 6
+### Phase 6: Complete
 
 Generates a bar from the top of the screen as well as the
 from the bottom, in pairs
@@ -48,7 +48,8 @@ Keeps track of the player's score and displays it at the end of the game
 
 ### Phase 9
 
-Aesthetic changes as desired
+Aesthetic changes as desired, smooth out entrance and exit of bars on
+screen
 
 ### Phase 10
 

@@ -40,8 +40,12 @@ GROUND_LEVEL   = SCREEN_HEIGHT - GROUND_HEIGHT # the position of the top of the
 ################################### Classes ####################################
 
 class BarPair:
+    """
+    Returns a surface containing a representation of a randomly generated bar
+    pair, and the height of the bottom bar.
+    """
     @staticmethod
-    def generate_bar_pair():
+    def __generate_bar_pair():
         height = rand.randint(MIN_BAR_LENGTH, MAX_BAR_LENGTH)
         surface = pygame.Surface((BAR_WIDTH, GROUND_LEVEL))
         top_bar = pygame.Surface((BAR_WIDTH, GROUND_LEVEL - BAR_GAP - height))
@@ -53,10 +57,10 @@ class BarPair:
 
         surface.blit(top_bar, (0, 0))
         surface.blit(bottom_bar, (0, GROUND_LEVEL - height))
-        return surface.convert()
+        return surface.convert(), height
 
     def __init__(self):
-        self.__surface = BarPair.generate_bar_pair()
+        self.__surface, self.__height = self.__generate_bar_pair()
         self.__x_pos = SCREEN_WIDTH - BAR_WIDTH
 
     """
@@ -64,6 +68,26 @@ class BarPair:
     """
     def get_x(self):
         return self.__x_pos
+
+    """
+    Returns True if any part of the bird is within the bounds of the top or 
+    bottom bar (ie. if the bird is in collision with a bar), else False
+    
+    Treats the bird as a square 
+    """
+    def detect_collision(self, bird):
+        # todo: fix so it treats bird as a circle
+        # jesus fucking christ this is disgusting
+        # checks whether any part of the bird "square" contacts either of the
+        # bars
+        if ((GROUND_LEVEL - self.__height - bird.radius) < bird.get_pos()[1]
+            or (GROUND_LEVEL - self.__height - BAR_GAP + bird.radius) >
+                        bird.get_pos()[1])\
+            and self.get_x()-bird.radius <= bird.get_pos()[0] \
+                                <= self.get_x()+ BAR_WIDTH +  bird.radius:
+            return True
+        else:
+            return False
 
     """
     Returns the surface representation of the bar pair
@@ -116,6 +140,15 @@ class BarList:
             pair.scroll()
         if self.n_bars() > 0 and self.__list[0].get_x() <= 0:
             self.__list.pop(0)
+
+    """
+    Checks all bar pairs for collision, returns True if collision else False
+    """
+    def detect_collision(self, bird):
+        for bar_pair in self.__list:
+            if bar_pair.detect_collision(bird):
+                return True
+        return False
 
 class Bird:
     def __init__(self):
@@ -183,6 +216,11 @@ while mainloop:
     # handle physics/graphics
     bird.next_frame()
     bars.scroll()
+    if bars.detect_collision(bird): # exit if collision
+        pygame.quit()
+        mainloop = False
+        print("You suck")
+        continue
 
     # redraw foreground
     foreground.fill(BLACK)

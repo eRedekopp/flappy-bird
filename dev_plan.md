@@ -37,7 +37,7 @@ it goes
 Generates a bar from the top of the screen as well as the
 from the bottom, in pairs
 
-### Phase 7
+### Phase 7: Complete
 
 Detects when the yellow dot comes into contact with a green bar, and
 ends the game when it happens

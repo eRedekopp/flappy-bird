@@ -11,10 +11,10 @@ import random as rand
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 400, 600
 
 # physics
-GRAVITY = 3.25
-JUMP_VELOCITY = -33
+GRAVITY = 3.15
+JUMP_VELOCITY = -31
 MAX_Y_VELOCITY = 12
-FRAME_RATE = 60
+FRAME_RATE = 55
 SCROLL_RATE = 7
 
 # colours
@@ -76,10 +76,9 @@ class BarPair:
     Treats the bird as a square 
     """
     def detect_collision(self, bird):
-        # todo: fix so it treats bird as a circle
-        # jesus fucking christ this is disgusting
         # checks whether any part of the bird "square" contacts either of the
         # bars
+        # This is as neat as I could make it look without going over 80 chars
         if ((GROUND_LEVEL - self.__height - bird.radius) < bird.get_pos()[1]
             or (GROUND_LEVEL - self.__height - BAR_GAP + bird.radius) >
                         bird.get_pos()[1])\
@@ -106,9 +105,13 @@ class BarList:
         self.__list = []
         self.__list.append(BarPair())
         self.__frames_since_last_pipe = 0
+        self.__bars_passed = 0
 
     def n_bars(self):
         return len(self.__list)
+
+    def n_bars_passed(self):
+        return self.__bars_passed
 
     def to_tuple(self):
         return tuple(self.__list)
@@ -118,7 +121,7 @@ class BarList:
         self.__list.append(new_bar_pair)
 
     """
-    Returns True if new bar is required, else false.
+    Returns True if new bar is required, else False.
     Should only be called once per frame
     """
     def __req_new_bar(self):
@@ -140,6 +143,7 @@ class BarList:
             pair.scroll()
         if self.n_bars() > 0 and self.__list[0].get_x() <= 0:
             self.__list.pop(0)
+            self.__bars_passed += 1
 
     """
     Checks all bar pairs for collision, returns True if collision else False
@@ -178,6 +182,8 @@ class Bird:
 
     def get_pos(self):
         return self.__x, self.__y
+
+
 
 
 #################################### Setup #####################################

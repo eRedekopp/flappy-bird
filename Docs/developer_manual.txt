@@ -43,6 +43,11 @@ Graphics:
     re-drawn every frame in the redraw_foreground() method. Finally, the screen
     is updated with the Frame.update() method, which re-draws the background and
     foreground onto the screen.
-
-
+    
+Limitations:
+    
+    - Inefficient in several ways, most notably how it it re-draws the entire 
+      foreground then re-draws the entire screen every frame. 
+    - Graphics are beyond terrible
+    - Imperfect collision detection
 

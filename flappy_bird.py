@@ -15,6 +15,7 @@ class Frame:
 
     WHITE = 255, 255, 255
     BLACK = 0, 0, 0
+    BLANK = 1, 1, 1   # use this for Surface color key
     BLUE = 115, 233, 251
     YELLOW = 233, 244, 14
     GREY = 100, 100, 100
@@ -24,6 +25,7 @@ class Frame:
     GROUND_HEIGHT = 40
     GROUND_LEVEL = HEIGHT - GROUND_HEIGHT  # the y position of the top of the
                                            # ground
+
     def __init__(self):
         # startup
         pygame.init()
@@ -32,15 +34,14 @@ class Frame:
         # set up screen
         self.__screen = pygame.display.set_mode(Frame.SIZE)
 
-        self.__background = pygame.Surface(Frame.SIZE).convert()  # background
-        self.__background.fill(Frame.BG_COLOUR)
+        self.__background = pygame.image.load("background.png").convert()
         self.__floor = pygame.Surface((Frame.WIDTH,
                                        Frame.GROUND_HEIGHT)).convert()
         self.__floor.fill(Frame.GREY)
         self.__background.blit(self.__floor, (0, Frame.GROUND_LEVEL))
 
         self.__foreground = pygame.Surface(Frame.SIZE).convert()  # foreground
-        self.__foreground.set_colorkey(Frame.BLACK)
+        self.__foreground.set_colorkey(Frame.BLANK)
 
         self.font = pygame.font.SysFont('Arial', 50)
 
@@ -49,7 +50,7 @@ class Frame:
     and displays the score
     """
     def redraw_foreground(self, barlist, bird):
-        self.__foreground.fill(Frame.BLACK)                  # erase foreground
+        self.__foreground.fill(Frame.BLANK)            # erase foreground
         for pair in barlist.to_tuple():                # draw bars
             self.__foreground.blit(pair.get_surface(),
                                    (pair.get_x(), 0))
@@ -81,7 +82,7 @@ class Frame:
     def draw_gameover_to_fg(self, score):
         game_over_text = "GAME OVER"
         score_text     = "Score: " + str(score)
-        self.__foreground.fill(Frame.BLACK)
+        self.__foreground.fill(Frame.BLANK)
         gameover_box = self.font.render(game_over_text,
                                     True,
                                     Frame.WHITE)
@@ -105,7 +106,7 @@ pygame.Surface, the height of the bottom of its gap, and its horizontal
 position
 """
 class BarPair:
-    WIDTH = 50
+    WIDTH = 70
     GAP_SIZE   = 140  # size of gap between top and bottom bars
     MAX_BAR_LENGTH = 400
     MIN_BAR_LENGTH = 150
@@ -120,16 +121,27 @@ class BarPair:
         height = rand.randint(BarPair.MIN_BAR_LENGTH, BarPair.MAX_BAR_LENGTH)
         surface = pygame.Surface((BarPair.WIDTH,
                                   Frame.GROUND_LEVEL))
+        surface.fill(Frame.BLANK)
+        surface.set_colorkey(Frame.BLANK)
         top_bar = pygame.Surface((BarPair.WIDTH,
                                   Frame.GROUND_LEVEL -
                                     BarPair.GAP_SIZE -
                                     height))
+        top_bar_inside = pygame.Surface((BarPair.WIDTH - 4,
+                                  Frame.GROUND_LEVEL -
+                                    BarPair.GAP_SIZE -
+                                    height - 2))
         bottom_bar = pygame.Surface((BarPair.WIDTH,
                                      height))
+        bottom_bar_inside = pygame.Surface((BarPair.WIDTH - 4,
+                                            height - 2))
 
-        bottom_bar.fill(BarPair.COLOUR)
-        top_bar.fill(BarPair.COLOUR)
-        surface.fill(Frame.BG_COLOUR)
+        bottom_bar.fill(Frame.BLACK) # create outlines
+        bottom_bar_inside.fill(BarPair.COLOUR)
+        bottom_bar.blit(bottom_bar_inside, (2, 2))
+        top_bar.fill(Frame.BLACK)
+        top_bar_inside.fill(BarPair.COLOUR)
+        top_bar.blit(top_bar_inside, (2, 0))
 
         surface.blit(top_bar, (0, 0))
         surface.blit(bottom_bar, (0, Frame.GROUND_LEVEL - height))
@@ -241,7 +253,6 @@ information
 """
 class Bird:
     RADIUS = 15
-    COLOUR = Frame.YELLOW
 
     """
     Returns a new pygame.Surface containing the graphical representation of the 
@@ -250,13 +261,9 @@ class Bird:
     @staticmethod
     def generate_graphic():
         surface = pygame.Surface((2*Bird.RADIUS, 2*Bird.RADIUS))
-        surface_centre = Bird.RADIUS, Bird.RADIUS
         surface.set_colorkey(Frame.BLACK)
-        surface.fill(Frame.BLACK)
-        pygame.draw.circle(surface,          # draw bird
-                           Bird.COLOUR,
-                           surface_centre,
-                           Bird.RADIUS)
+        bird = pygame.image.load("bird.png").convert()
+        surface.blit(bird, (0, 0))
         return surface
 
     def __init__(self):

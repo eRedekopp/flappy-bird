@@ -39,6 +39,9 @@ GROUND_LEVEL   = SCREEN_HEIGHT - GROUND_HEIGHT # the position of the top of the
 
 ################################### Classes ####################################
 
+"""
+Represents an individual pair of bars
+"""
 class BarPair:
     """
     Returns a surface containing a representation of a randomly generated bar
@@ -100,6 +103,9 @@ class BarPair:
     def scroll(self):
         self.__x_pos -= SCROLL_RATE
 
+"""
+A list of bars that appear on the screen at a given time; acts like a queue
+"""
 class BarList:
     def __init__(self):
         self.__list = []
@@ -154,6 +160,9 @@ class BarList:
                 return True
         return False
 
+"""
+Represents the player-controlled bird, visually represented as a circle
+"""
 class Bird:
     def __init__(self):
         self.__x = 50
@@ -208,7 +217,6 @@ class Frame:
     Updates the foreground to represent the given barlist and bird 
     """
     def redraw_foreground(self, barlist, bird):
-        # redraw foreground
         self.__foreground.fill(BLACK)
         for pair in barlist.to_tuple():
             self.__foreground.blit(pair.get_surface(), (pair.get_x(), 0))
@@ -217,6 +225,9 @@ class Frame:
                            bird.get_pos(),
                            bird.radius)
 
+    """
+    Redraws the background and foreground onto the display
+    """
     def update(self):
         self.__screen.blit(self.__background, (0, 0))
         self.__screen.blit(self.__foreground, (0, 0))

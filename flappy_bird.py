@@ -86,9 +86,9 @@ class BarPair:
         bird_x, bird_y = bird.get_pos()
         if (bird_y > bottom_limit or bird_y < top_limit)     \
             and                                              \
-                           self.get_x() - bird.radius        \
-                        <= bird_x                            \
-                        <= self.get_x() + BAR_WIDTH +  bird.radius:
+                 self.get_x() - bird.radius                  \
+              <= bird_x                                      \
+              <= self.get_x() + BAR_WIDTH +  bird.radius:
             return True
         else:
             return False

@@ -233,35 +233,52 @@ class Frame:
         self.__screen.blit(self.__foreground, (0, 0))
         pygame.display.flip()
 
-################################## Main Loop ###################################
+"""
+Controller class that runs all operations of a game
+"""
+class Game:
+    def __init__(self):
+        self.__frame = Frame()
+        self.__clock = pygame.time.Clock()
+        self.__bars  = BarList()
+        self.__bird  = Bird()
+        self.__running = False
 
-mainloop = True
-frame = Frame()
-clock = pygame.time.Clock()
-bars = BarList()
-bird = Bird()
-while mainloop:
-    # handle events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            mainloop = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            bird.jump()
+    def __check_for_input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.__running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.__bird.jump()
 
-    # handle physics/graphics
-    bird.next_frame()
-    bars.scroll()
-    if bars.detect_collision(bird): # exit if collision
+    def __handle_physics(self):
+        self.__bird.next_frame()
+        self.__bars.scroll()
+        if self.__bars.detect_collision(self.__bird):  # exit if collision
+            self.__running = False
+
+    """
+    Begins a game. Ceases all functions as soon as game finishes, ie. does 
+    not exit
+    """
+    def run(self):
+        self.__running = True
+        while self.__running:
+            self.__check_for_input()
+            self.__handle_physics()
+            self.__frame.redraw_foreground(self.__bars, self.__bird)
+            self.__frame.update()
+            self.__clock.tick(FRAME_RATE)
+
+    def quit(self):
+        self.__running = False
         pygame.quit()
-        mainloop = False
-        print("You suck")
-        continue
 
-    frame.redraw_foreground(bars, bird)
-    frame.update()
 
-    # force frame rate
-    clock.tick(FRAME_RATE)
+################################ Main Program ##################################
+
+game = Game()
+game.run()
+game.quit()
 
 

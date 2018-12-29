@@ -8,6 +8,98 @@ import random as rand
 ################################### Classes ####################################
 
 """
+A frame containing the graphics of the game
+"""
+class Frame:
+    SIZE = WIDTH, HEIGHT = 400, 600
+
+    WHITE = 255, 255, 255
+    BLACK = 0, 0, 0
+    BLUE = 115, 233, 251
+    YELLOW = 233, 244, 14
+    GREY = 100, 100, 100
+    GREEN = 40, 190, 40
+    BG_COLOUR = BLUE
+
+    GROUND_HEIGHT = 40
+    GROUND_LEVEL = HEIGHT - GROUND_HEIGHT  # the y position of the top of the
+                                           # ground
+    def __init__(self):
+        # startup
+        pygame.init()
+        pygame.display.set_caption("Flappy Bird")
+
+        # set up screen
+        self.__screen = pygame.display.set_mode(Frame.SIZE)
+
+        self.__background = pygame.Surface(Frame.SIZE).convert()  # background
+        self.__background.fill(Frame.BG_COLOUR)
+        self.__floor = pygame.Surface((Frame.WIDTH,
+                                       Frame.GROUND_HEIGHT)).convert()
+        self.__floor.fill(Frame.GREY)
+        self.__background.blit(self.__floor, (0, Frame.GROUND_LEVEL))
+
+        self.__foreground = pygame.Surface(Frame.SIZE).convert()  # foreground
+        self.__foreground.set_colorkey(Frame.BLACK)
+
+        self.font = pygame.font.SysFont('Arial', 50)
+
+    """
+    Updates the foreground to represent the given BarList and bird, 
+    and displays the score
+    """
+    def redraw_foreground(self, barlist, bird):
+        self.__foreground.fill(Frame.BLACK)                  # erase foreground
+        for pair in barlist.to_tuple():                # draw bars
+            self.__foreground.blit(pair.get_surface(),
+                                   (pair.get_x(), 0))
+        bird_x, bird_y = bird.get_pos()                # draw bird
+        bird_surface_x = bird_x - bird.RADIUS
+        bird_surface_y = bird_y - bird.RADIUS
+        self.__foreground.blit(bird.get_surface(),
+                              (bird_surface_x, bird_surface_y))
+
+        text_box = self.font.render(str(barlist.n_bars_passed()), # draw score
+                                    True,
+                                    Frame.WHITE)
+        text_x_location = Frame.WIDTH // 2 - text_box.get_width() // 2
+        self.__foreground.blit(text_box,
+                               (text_x_location, 5))
+
+
+    """
+    Redraws the background and foreground onto the display
+    """
+    def update(self):
+        self.__screen.blit(self.__background, (0, 0))
+        self.__screen.blit(self.__foreground, (0, 0))
+        pygame.display.flip()
+
+    """
+    Erases the current foreground and replaces it with the game over screen
+    """
+    def draw_gameover_to_fg(self, score):
+        game_over_text = "GAME OVER"
+        score_text     = "Score: " + str(score)
+        self.__foreground.fill(Frame.BLACK)
+        gameover_box = self.font.render(game_over_text,
+                                    True,
+                                    Frame.WHITE)
+        score_box = self.font.render(score_text,
+                                     True,
+                                     Frame.WHITE)
+        text_box_width = max([gameover_box.get_width(), score_box.get_width()])
+        text_box_height = gameover_box.get_height() + score_box.get_height()
+        text_box = pygame.Surface((text_box_width,
+                                  text_box_height))
+        text_box.blit(gameover_box, (0, 0))
+        text_box.blit(score_box, (0, gameover_box.get_height()))
+        text_box_position = Frame.WIDTH // 2 - text_box.get_width() // 2, \
+                            Frame.HEIGHT // 2 - text_box.get_height() // 2
+        self.__foreground.blit(text_box, text_box_position)
+
+
+"""
 Represents an individual pair of bars: contains a graphical representation as a 
 pygame.Surface, the height of the bottom of its gap, and its horizontal 
 position
@@ -204,96 +296,6 @@ class Bird:
     def get_pos(self):
         return self.__x, self.__y
 
-"""
-A frame containing the graphics of the game
-"""
-class Frame:
-    SIZE = WIDTH, HEIGHT = 400, 600
-
-    WHITE = 255, 255, 255
-    BLACK = 0, 0, 0
-    BLUE = 115, 233, 251
-    YELLOW = 233, 244, 14
-    GREY = 100, 100, 100
-    GREEN = 40, 190, 40
-    BG_COLOUR = BLUE
-
-    GROUND_HEIGHT = 40
-    GROUND_LEVEL = HEIGHT - GROUND_HEIGHT  # the y position of the top of the
-                                           # ground
-    def __init__(self):
-        # startup
-        pygame.init()
-        pygame.display.set_caption("Flappy Bird")
-
-        # set up screen
-        self.__screen = pygame.display.set_mode(Frame.SIZE)
-
-        self.__background = pygame.Surface(Frame.SIZE).convert()  # background
-        self.__background.fill(Frame.BG_COLOUR)
-        self.__floor = pygame.Surface((Frame.WIDTH,
-                                       Frame.GROUND_HEIGHT)).convert()
-        self.__floor.fill(Frame.GREY)
-        self.__background.blit(self.__floor, (0, Frame.GROUND_LEVEL))
-
-        self.__foreground = pygame.Surface(Frame.SIZE).convert()  # foreground
-        self.__foreground.set_colorkey(Frame.BLACK)
-
-        self.font = pygame.font.SysFont('Arial', 50)
-
-    """
-    Updates the foreground to represent the given BarList and bird, 
-    and displays the score
-    """
-    def redraw_foreground(self, barlist, bird):
-        self.__foreground.fill(Frame.BLACK)                  # erase foreground
-        for pair in barlist.to_tuple():                # draw bars
-            self.__foreground.blit(pair.get_surface(),
-                                   (pair.get_x(), 0))
-        bird_x, bird_y = bird.get_pos()                # draw bird
-        bird_surface_x = bird_x - bird.RADIUS
-        bird_surface_y = bird_y - bird.RADIUS
-        self.__foreground.blit(bird.get_surface(),
-                              (bird_surface_x, bird_surface_y))
-
-        text_box = self.font.render(str(barlist.n_bars_passed()), # draw score
-                                    True,
-                                    Frame.WHITE)
-        text_x_location = Frame.WIDTH // 2 - text_box.get_width() // 2
-        self.__foreground.blit(text_box,
-                               (text_x_location, 5))
-
-
-    """
-    Redraws the background and foreground onto the display
-    """
-    def update(self):
-        self.__screen.blit(self.__background, (0, 0))
-        self.__screen.blit(self.__foreground, (0, 0))
-        pygame.display.flip()
-
-    """
-    Erases the current foreground and replaces it with the game over screen
-    """
-    def draw_gameover_to_fg(self, score):
-        game_over_text = "GAME OVER"
-        score_text     = "Score: " + str(score)
-        self.__foreground.fill(Frame.BLACK)
-        gameover_box = self.font.render(game_over_text,
-                                    True,
-                                    Frame.WHITE)
-        score_box = self.font.render(score_text,
-                                     True,
-                                     Frame.WHITE)
-        text_box_width = max([gameover_box.get_width(), score_box.get_width()])
-        text_box_height = gameover_box.get_height() + score_box.get_height()
-        text_box = pygame.Surface((text_box_width,
-                                  text_box_height))
-        text_box.blit(gameover_box, (0, 0))
-        text_box.blit(score_box, (0, gameover_box.get_height()))
-        text_box_position = Frame.WIDTH // 2 - text_box.get_width() // 2, \
-                            Frame.HEIGHT // 2 - text_box.get_height() // 2
-        self.__foreground.blit(text_box, text_box_position)
 
 """
 Controller class that runs all operations of a game

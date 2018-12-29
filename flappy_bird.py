@@ -183,30 +183,49 @@ class Bird:
     def get_pos(self):
         return self.__x, self.__y
 
+"""
+A frame containing the graphics of the game
+"""
+class Frame:
+    def __init__(self):
+        # startup
+        pygame.init()
+        pygame.display.set_caption("Flappy Bird")
 
+        # set up screen
+        self.__screen = pygame.display.set_mode(SCREEN_SIZE)
 
+        self.__background = pygame.Surface(SCREEN_SIZE).convert()  # background
+        self.__background.fill(BG_COLOUR)
+        self.__floor = pygame.Surface((SCREEN_WIDTH, GROUND_HEIGHT)).convert()
+        self.__floor.fill(GREY)
+        self.__background.blit(self.__floor, (0, GROUND_LEVEL))
 
-#################################### Setup #####################################
+        self.__foreground = pygame.Surface(SCREEN_SIZE).convert()  # foreground
+        self.__foreground.set_colorkey(BLACK)
 
-# startup
-pygame.init()
-pygame.display.set_caption("Flappy Bird")
+    """
+    Updates the foreground to represent the given barlist and bird 
+    """
+    def redraw_foreground(self, barlist, bird):
+        # redraw foreground
+        self.__foreground.fill(BLACK)
+        for pair in barlist.to_tuple():
+            self.__foreground.blit(pair.get_surface(), (pair.get_x(), 0))
+        pygame.draw.circle(self.__foreground,
+                           bird.colour,
+                           bird.get_pos(),
+                           bird.radius)
 
-# set up screen
-screen = pygame.display.set_mode(SCREEN_SIZE)
-
-background = pygame.Surface(SCREEN_SIZE).convert()   # background
-background.fill(BG_COLOUR)
-floor = pygame.Surface((SCREEN_WIDTH, GROUND_HEIGHT)).convert()
-floor.fill(GREY)
-background.blit(floor, (0, GROUND_LEVEL))
-
-foreground = pygame.Surface(SCREEN_SIZE).convert()   # foreground
-foreground.set_colorkey(BLACK)
+    def update(self):
+        self.__screen.blit(self.__background, (0, 0))
+        self.__screen.blit(self.__foreground, (0, 0))
+        pygame.display.flip()
 
 ################################## Main Loop ###################################
 
 mainloop = True
+frame = Frame()
 clock = pygame.time.Clock()
 bars = BarList()
 bird = Bird()
@@ -228,19 +247,8 @@ while mainloop:
         print("You suck")
         continue
 
-    # redraw foreground
-    foreground.fill(BLACK)
-    for pair in bars.to_tuple():
-        foreground.blit(pair.get_surface(), (pair.get_x(), 0))
-    pygame.draw.circle(foreground,
-                       bird.colour,
-                       bird.get_pos(),
-                       bird.radius)
-
-    # update screen
-    screen.blit(background, (0, 0))
-    screen.blit(foreground, (0, 0))
-    pygame.display.flip()
+    frame.redraw_foreground(bars, bird)
+    frame.update()
 
     # force frame rate
     clock.tick(FRAME_RATE)

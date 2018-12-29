@@ -168,12 +168,36 @@ Represents the player-controlled bird's position, velocity, and graphical
 information
 """
 class Bird:
+    radius = 15
+    colour = YELLOW
+
+    """
+    Returns a new pygame.Surface containing the graphical representation of the 
+    Bird
+    """
+    @staticmethod
+    def generate_graphic():
+        surface = pygame.Surface((2*Bird.radius, 2*Bird.radius))
+        surface_centre = Bird.radius, Bird.radius
+        surface.set_colorkey(BLACK)
+        surface.fill(BLACK)
+        pygame.draw.circle(surface,          # draw bird
+                           YELLOW,
+                           surface_centre,
+                           Bird.radius)
+        return surface
+
     def __init__(self):
         self.__x = 50
         self.__y = 200
         self.__y_velocity = GRAVITY
-        self.colour = YELLOW
-        self.radius = 15
+        self.__surface = Bird.generate_graphic()
+
+    """
+    Returns a surface containing a graphical representation of the bird
+    """
+    def get_surface(self):
+        return self.__surface
 
     """
     Set y velocity to JUMP_VELOCITY
@@ -228,15 +252,16 @@ class Frame:
     """
     def redraw_foreground(self, barlist, bird):
         self.__foreground.fill(BLACK)                  # erase foreground
-        for pair in barlist.to_tuple():
-            self.__foreground.blit(pair.get_surface(), # draw bars
+        for pair in barlist.to_tuple():                # draw bars
+            self.__foreground.blit(pair.get_surface(),
                                    (pair.get_x(), 0))
-        pygame.draw.circle(self.__foreground,          # draw bird
-                           bird.colour,
-                           bird.get_pos(),
-                           bird.radius)
-                                                       # draw score
-        text_box = self.font.render(str(barlist.n_bars_passed()),
+        bird_x, bird_y = bird.get_pos()                # draw bird
+        bird_surface_x = bird_x - bird.radius
+        bird_surface_y = bird_y - bird.radius
+        self.__foreground.blit(bird.get_surface(),
+                              (bird_surface_x, bird_surface_y))
+
+        text_box = self.font.render(str(barlist.n_bars_passed()), # draw score
                                     True,
                                     WHITE)
         text_x_location = SCREEN_WIDTH // 2 - text_box.get_width() // 2

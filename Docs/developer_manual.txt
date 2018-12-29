@@ -1,0 +1,48 @@
+flappy_bird.py developer manual
+
+Note: for the purposes of this manual, "Frame" refers to the Frame class or an
+instance thereof, and "frame" refers to a single frame of animation
+
+Control:
+
+    All control is done through the Game class, which contains a Frame, Bird,
+    and BarList. The run() method runs the game at 60fps, then shows the game
+    over screen until the user either presses enter or exits the frame. In each
+    frame, the bars are scrolled over and a new bar is created if necessary (via
+    BarList.scroll()) and the bird's velocity is affected as necessary by
+    gravity and dropped on the screen by its velocity (via Bird.next_frame())
+
+    A new Game object is created at the beginning of every new game - continuing
+    in an infinite loop until the user exits with the x button on the frame
+
+Physics:
+
+    When the bird "jumps", its velocity is instantly set to JUMP_VELOCITY; there
+    is no curve. The bird accelerates by GRAVITY every frame until it either
+    hits the ground or reaches the max y velocity. The bird does not move to the
+    right, rather the bars scroll to the left.
+
+    Collision detection treats the bird as a square with sides equal to the
+    bird's radius, and detects a collision if there is any overlap between the
+    bird's "square" and any of the bars on the screen
+
+Scoring:
+
+    The score is kept in the BarList class, which adds one to its counter each
+    time a bar is popped off of the front of the BarList. This is reset at the
+    beginning of each new game when a new BarList is created
+
+Graphics:
+
+    All graphics are handled within the Frame class, which is a very simple
+    implementation which uses the pygame display. It is worth noting that a
+    BarPair stores its own graphical representation as a pygame.Surface.
+
+    The background contains the blue sky and the grey ground, and is never
+    edited after the Frame is initialized. The foreground is fully erased and
+    re-drawn every frame in the redraw_foreground() method. Finally, the screen
+    is updated with the Frame.update() method, which re-draws the background and
+    foreground onto the screen.
+
+
+

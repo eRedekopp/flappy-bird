@@ -27,8 +27,8 @@ GREEN  = 40, 190, 40
 
 # graphics
 BAR_WIDTH      = 50
-BAR_GAP        = 140
-BAR_FREQUENCY  = 45    # n of frames until new bar is generated
+BAR_GAP        = 140   # size of gap between top and bottom bars
+BAR_FREQUENCY  = 45    # n of frames between new bars
 BAR_COLOUR     = GREEN
 BG_COLOUR      = BLUE
 MAX_BAR_LENGTH = 400
@@ -40,7 +40,9 @@ GROUND_LEVEL   = SCREEN_HEIGHT - GROUND_HEIGHT # the position of the top of the
 ################################### Classes ####################################
 
 """
-Represents an individual pair of bars
+Represents an individual pair of bars: contains a graphical representation as a 
+pygame.Surface, the height of the bottom of its gap, and its horizontal 
+position
 """
 class BarPair:
     """
@@ -92,7 +94,7 @@ class BarPair:
             return False
 
     """
-    Returns the surface representation of the bar pair
+    Returns the graphical representation of the bar pair as a pygame.Surface
     """
     def get_surface(self):
         return self.__surface
@@ -162,7 +164,8 @@ class BarList:
         return False
 
 """
-Represents the player-controlled bird, visually represented as a circle
+Represents the player-controlled bird's position, velocity, and graphical 
+information
 """
 class Bird:
     def __init__(self):
@@ -190,6 +193,9 @@ class Bird:
             self.__y_velocity += GRAVITY
         self.__y += int(self.__y_velocity)
 
+    """
+    Returns the x and y position of the bird's centre as a tuple
+    """
     def get_pos(self):
         return self.__x, self.__y
 
@@ -317,8 +323,9 @@ class Game:
                     return
 
     """
-    Begins a game. Ceases all functions as soon as game finishes, ie. does 
-    not exit
+    Begins a game. Loops until the game is over or the user presses the x 
+    button on the frame, then displays the game over screen until the user 
+    exits, or presses Enter to start a new game.
     """
     def run(self):
         self.__running = True

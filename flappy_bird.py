@@ -5,38 +5,6 @@ Flappy Bird clone game
 import pygame
 import random as rand
 
-################################## Constants ###################################
-
-# screen
-SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 400, 600
-
-# physics
-GRAVITY = 3.15
-JUMP_VELOCITY = -31
-MAX_Y_VELOCITY = 12
-FRAME_RATE = 55
-SCROLL_RATE = 7
-
-# colours
-WHITE  = 255, 255, 255
-BLACK  = 0, 0, 0
-BLUE   = 115, 233, 251
-YELLOW = 233, 244, 14
-GREY   = 100, 100, 100
-GREEN  = 40, 190, 40
-
-# graphics
-BAR_WIDTH      = 50
-BAR_GAP        = 140   # size of gap between top and bottom bars
-BAR_FREQUENCY  = 45    # n of frames between new bars
-BAR_COLOUR     = GREEN
-BG_COLOUR      = BLUE
-MAX_BAR_LENGTH = 400
-MIN_BAR_LENGTH = 150
-GROUND_HEIGHT  = 40
-GROUND_LEVEL   = SCREEN_HEIGHT - GROUND_HEIGHT # the position of the top of the
-                                               # ground
-
 ################################### Classes ####################################
 
 """
@@ -45,28 +13,39 @@ pygame.Surface, the height of the bottom of its gap, and its horizontal
 position
 """
 class BarPair:
+    WIDTH = 50
+    GAP_SIZE   = 140  # size of gap between top and bottom bars
+    MAX_BAR_LENGTH = 400
+    MIN_BAR_LENGTH = 150
+    COLOUR = Frame.GREEN
+
     """
     Returns a surface containing a representation of a randomly generated bar
     pair, and the height of the bottom bar.
     """
     @staticmethod
     def __generate_bar_pair():
-        height = rand.randint(MIN_BAR_LENGTH, MAX_BAR_LENGTH)
-        surface = pygame.Surface((BAR_WIDTH, GROUND_LEVEL))
-        top_bar = pygame.Surface((BAR_WIDTH, GROUND_LEVEL - BAR_GAP - height))
-        bottom_bar = pygame.Surface((BAR_WIDTH, height))
+        height = rand.randint(BarPair.MIN_BAR_LENGTH, BarPair.MAX_BAR_LENGTH)
+        surface = pygame.Surface((BarPair.WIDTH,
+                                  Frame.GROUND_LEVEL))
+        top_bar = pygame.Surface((BarPair.WIDTH,
+                                  Frame.GROUND_LEVEL -
+                                    BarPair.GAP_SIZE -
+                                    height))
+        bottom_bar = pygame.Surface((BarPair.WIDTH,
+                                     height))
 
-        bottom_bar.fill(BAR_COLOUR)
-        top_bar.fill(BAR_COLOUR)
-        surface.fill(BG_COLOUR)
+        bottom_bar.fill(BarPair.COLOUR)
+        top_bar.fill(BarPair.COLOUR)
+        surface.fill(Frame.BG_COLOUR)
 
         surface.blit(top_bar, (0, 0))
-        surface.blit(bottom_bar, (0, GROUND_LEVEL - height))
+        surface.blit(bottom_bar, (0, Frame.GROUND_LEVEL - height))
         return surface.convert(), height
 
     def __init__(self):
         self.__surface, self.__height = self.__generate_bar_pair()
-        self.__x_pos = SCREEN_WIDTH - BAR_WIDTH
+        self.__x_pos = Frame.WIDTH - BarPair.WIDTH
 
     """
     Returns the x position of the bar pair
@@ -81,14 +60,15 @@ class BarPair:
     Treats the bird as a square with sides as long as the bird's radius
     """
     def detect_collision(self, bird):
-        bottom_limit = GROUND_LEVEL - self.__height - bird.radius
-        top_limit = GROUND_LEVEL - self.__height - BAR_GAP + bird.radius
+        bottom_limit = Frame.GROUND_LEVEL - self.__height - bird.RADIUS
+        top_limit = Frame.GROUND_LEVEL - self.__height \
+                    - BarPair.GAP_SIZE + bird.RADIUS
         bird_x, bird_y = bird.get_pos()
         if (bird_y > bottom_limit or bird_y < top_limit)     \
             and                                              \
-                 self.get_x() - bird.radius                  \
+                 self.get_x() - bird.RADIUS                  \
               <= bird_x                                      \
-              <= self.get_x() + BAR_WIDTH +  bird.radius:
+              <= self.get_x() + BarPair.WIDTH +  bird.RADIUS:
             return True
         else:
             return False
@@ -103,7 +83,7 @@ class BarPair:
     Moves the bar pair to the left by SCROLL_RATE pixels
     """
     def scroll(self):
-        self.__x_pos -= SCROLL_RATE
+        self.__x_pos -= Game.SCROLL_RATE
 
 """
 A list of bars that appear on the screen at a given time; acts like a queue. 
@@ -134,7 +114,7 @@ class BarList:
     Should only be called once per frame
     """
     def __req_new_bar(self):
-        if self.__frames_since_last_pipe == BAR_FREQUENCY:
+        if self.__frames_since_last_pipe == Game.BAR_FREQUENCY:
             self.__frames_since_last_pipe = 0
             return True
         else:
@@ -168,8 +148,8 @@ Represents the player-controlled bird's position, velocity, and graphical
 information
 """
 class Bird:
-    radius = 15
-    colour = YELLOW
+    RADIUS = 15
+    COLOUR = Frame.YELLOW
 
     """
     Returns a new pygame.Surface containing the graphical representation of the 
@@ -177,20 +157,20 @@ class Bird:
     """
     @staticmethod
     def generate_graphic():
-        surface = pygame.Surface((2*Bird.radius, 2*Bird.radius))
-        surface_centre = Bird.radius, Bird.radius
-        surface.set_colorkey(BLACK)
-        surface.fill(BLACK)
+        surface = pygame.Surface((2*Bird.RADIUS, 2*Bird.RADIUS))
+        surface_centre = Bird.RADIUS, Bird.RADIUS
+        surface.set_colorkey(Frame.BLACK)
+        surface.fill(Frame.BLACK)
         pygame.draw.circle(surface,          # draw bird
-                           YELLOW,
+                           Bird.COLOUR,
                            surface_centre,
-                           Bird.radius)
+                           Bird.RADIUS)
         return surface
 
     def __init__(self):
         self.__x = 50
         self.__y = 200
-        self.__y_velocity = GRAVITY
+        self.__y_velocity = Game.GRAVITY
         self.__surface = Bird.generate_graphic()
 
     """
@@ -200,21 +180,22 @@ class Bird:
         return self.__surface
 
     """
-    Set y velocity to JUMP_VELOCITY
+    Set y velocity to Game.JUMP_VELOCITY
     """
     def jump(self):
-        self.__y_velocity = JUMP_VELOCITY
+        self.__y_velocity = Game.JUMP_VELOCITY
 
     """
     Adjust position and velocity for one frame
     """
     def next_frame(self):
-        if self.__y >= GROUND_LEVEL - self.radius and self.__y_velocity > 0:
+        if self.__y >= Frame.GROUND_LEVEL - self.RADIUS \
+                and self.__y_velocity > 0:
             self.__y_velocity = 0
-            self.__y = GROUND_LEVEL - self.radius
-        elif self.__y_velocity < MAX_Y_VELOCITY \
-                and self.__y < GROUND_LEVEL - self.radius:
-            self.__y_velocity += GRAVITY
+            self.__y = Frame.GROUND_LEVEL - self.RADIUS
+        elif self.__y_velocity < Game.MAX_Y_VELOCITY \
+                and self.__y < Frame.GROUND_LEVEL - self.RADIUS:
+            self.__y_velocity += Game.GRAVITY
         self.__y += int(self.__y_velocity)
 
     """
@@ -227,22 +208,36 @@ class Bird:
 A frame containing the graphics of the game
 """
 class Frame:
+    SIZE = WIDTH, HEIGHT = 400, 600
+
+    WHITE = 255, 255, 255
+    BLACK = 0, 0, 0
+    BLUE = 115, 233, 251
+    YELLOW = 233, 244, 14
+    GREY = 100, 100, 100
+    GREEN = 40, 190, 40
+    BG_COLOUR = BLUE
+
+    GROUND_HEIGHT = 40
+    GROUND_LEVEL = HEIGHT - GROUND_HEIGHT  # the y position of the top of the
+                                           # ground
     def __init__(self):
         # startup
         pygame.init()
         pygame.display.set_caption("Flappy Bird")
 
         # set up screen
-        self.__screen = pygame.display.set_mode(SCREEN_SIZE)
+        self.__screen = pygame.display.set_mode(Frame.SIZE)
 
-        self.__background = pygame.Surface(SCREEN_SIZE).convert()  # background
-        self.__background.fill(BG_COLOUR)
-        self.__floor = pygame.Surface((SCREEN_WIDTH, GROUND_HEIGHT)).convert()
-        self.__floor.fill(GREY)
-        self.__background.blit(self.__floor, (0, GROUND_LEVEL))
+        self.__background = pygame.Surface(Frame.SIZE).convert()  # background
+        self.__background.fill(Frame.BG_COLOUR)
+        self.__floor = pygame.Surface((Frame.WIDTH,
+                                       Frame.GROUND_HEIGHT)).convert()
+        self.__floor.fill(Frame.GREY)
+        self.__background.blit(self.__floor, (0, Frame.GROUND_LEVEL))
 
-        self.__foreground = pygame.Surface(SCREEN_SIZE).convert()  # foreground
-        self.__foreground.set_colorkey(BLACK)
+        self.__foreground = pygame.Surface(Frame.SIZE).convert()  # foreground
+        self.__foreground.set_colorkey(Frame.BLACK)
 
         self.font = pygame.font.SysFont('Arial', 50)
 
@@ -251,20 +246,20 @@ class Frame:
     and displays the score
     """
     def redraw_foreground(self, barlist, bird):
-        self.__foreground.fill(BLACK)                  # erase foreground
+        self.__foreground.fill(Frame.BLACK)                  # erase foreground
         for pair in barlist.to_tuple():                # draw bars
             self.__foreground.blit(pair.get_surface(),
                                    (pair.get_x(), 0))
         bird_x, bird_y = bird.get_pos()                # draw bird
-        bird_surface_x = bird_x - bird.radius
-        bird_surface_y = bird_y - bird.radius
+        bird_surface_x = bird_x - bird.RADIUS
+        bird_surface_y = bird_y - bird.RADIUS
         self.__foreground.blit(bird.get_surface(),
                               (bird_surface_x, bird_surface_y))
 
         text_box = self.font.render(str(barlist.n_bars_passed()), # draw score
                                     True,
-                                    WHITE)
-        text_x_location = SCREEN_WIDTH // 2 - text_box.get_width() // 2
+                                    Frame.WHITE)
+        text_x_location = Frame.WIDTH // 2 - text_box.get_width() // 2
         self.__foreground.blit(text_box,
                                (text_x_location, 5))
 
@@ -283,27 +278,34 @@ class Frame:
     def draw_gameover_to_fg(self, score):
         game_over_text = "GAME OVER"
         score_text     = "Score: " + str(score)
-        self.__foreground.fill(BLACK)
+        self.__foreground.fill(Frame.BLACK)
         gameover_box = self.font.render(game_over_text,
                                     True,
-                                    WHITE)
+                                    Frame.WHITE)
         score_box = self.font.render(score_text,
                                      True,
-                                     WHITE)
+                                     Frame.WHITE)
         text_box_width = max([gameover_box.get_width(), score_box.get_width()])
         text_box_height = gameover_box.get_height() + score_box.get_height()
         text_box = pygame.Surface((text_box_width,
                                   text_box_height))
         text_box.blit(gameover_box, (0, 0))
         text_box.blit(score_box, (0, gameover_box.get_height()))
-        text_box_position = SCREEN_WIDTH // 2 - text_box.get_width() // 2, \
-                            SCREEN_HEIGHT // 2 - text_box.get_height() // 2
+        text_box_position = Frame.WIDTH // 2 - text_box.get_width() // 2, \
+                            Frame.HEIGHT // 2 - text_box.get_height() // 2
         self.__foreground.blit(text_box, text_box_position)
 
 """
 Controller class that runs all operations of a game
 """
 class Game:
+    GRAVITY = 3.15
+    JUMP_VELOCITY = -31
+    MAX_Y_VELOCITY = 12
+    FRAME_RATE = 55
+    SCROLL_RATE = 7
+    BAR_FREQUENCY = 45  # n of frames between new bars
+
     def __init__(self):
         self.__frame = Frame()
         self.__clock = pygame.time.Clock()
@@ -358,7 +360,7 @@ class Game:
             self.__handle_physics()
             self.__frame.redraw_foreground(self.__bars, self.__bird)
             self.__frame.update()
-            self.__clock.tick(FRAME_RATE)
+            self.__clock.tick(Game.FRAME_RATE)
 
         return self.__game_over()
 

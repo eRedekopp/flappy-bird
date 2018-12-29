@@ -214,7 +214,7 @@ class Frame:
         self.__foreground = pygame.Surface(SCREEN_SIZE).convert()  # foreground
         self.__foreground.set_colorkey(BLACK)
 
-        self.font = pygame.font.SysFont('Comic Sans MS', 50)
+        self.font = pygame.font.SysFont('Arial', 50)
 
 
     """
@@ -246,6 +246,29 @@ class Frame:
         self.__screen.blit(self.__background, (0, 0))
         self.__screen.blit(self.__foreground, (0, 0))
         pygame.display.flip()
+
+    """
+    Erases the current foreground and replaces it with the game over screen
+    """
+    def draw_gameover_to_fg(self, score):
+        game_over_text = "GAME OVER"
+        score_text     = "Score: " + str(score)
+        self.__foreground.fill(BLACK)
+        gameover_box = self.font.render(game_over_text,
+                                    True,
+                                    WHITE)
+        score_box = self.font.render(score_text,
+                                     True,
+                                     WHITE)
+        text_box_width = max([gameover_box.get_width(), score_box.get_width()])
+        text_box_height = gameover_box.get_height() + score_box.get_height()
+        text_box = pygame.Surface((text_box_width,
+                                  text_box_height))
+        text_box.blit(gameover_box, (0, 0))
+        text_box.blit(score_box, (0, gameover_box.get_height()))
+        text_box_position = SCREEN_WIDTH // 2 - text_box.get_width() // 2, \
+                            SCREEN_HEIGHT // 2 - text_box.get_height() // 2
+        self.__foreground.blit(text_box, text_box_position)
 
 """
 Controller class that runs all operations of a game
@@ -279,6 +302,21 @@ class Game:
             self.__running = False
 
     """
+    Show game over screen; return when user presses enter or exit game if 
+    user presses x button on window
+    """
+    def __game_over(self):
+        self.__frame.draw_gameover_to_fg(self.__bars.n_bars_passed())
+        self.__frame.update()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+                elif event.type == pygame.KEYDOWN \
+                        and event.key == pygame.K_RETURN:
+                    return
+
+    """
     Begins a game. Ceases all functions as soon as game finishes, ie. does 
     not exit
     """
@@ -291,15 +329,21 @@ class Game:
             self.__frame.update()
             self.__clock.tick(FRAME_RATE)
 
-    def quit(self):
-        self.__running = False
+        return self.__game_over()
+
+    """
+    Shuts down the game and exits the program entirely
+    """
+    @staticmethod
+    def quit():
         pygame.quit()
+        quit(0)
 
 
 ################################ Main Program ##################################
 
-game = Game()
-game.run()
-game.quit()
-
+# Infinite loop: game can only be exited by hitting x button of window
+while True:
+    game = Game()
+    game.run()
 

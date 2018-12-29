@@ -42,11 +42,11 @@ from the bottom, in pairs
 Detects when the yellow dot comes into contact with a green bar, and
 ends the game when it happens
 
-### Phase 8
+### Phase 8: Complete
 
 Keeps track of the player's score and displays it at the end of the game
 
-### Phase 9
+### Phase 9: Skipped
 
 Aesthetic changes as desired, smooth out entrance and exit of bars on
 screen

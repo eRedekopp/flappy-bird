@@ -28,7 +28,7 @@ GREEN  = 40, 190, 40
 # graphics
 BAR_WIDTH      = 50
 BAR_GAP        = 140
-BAR_FREQUENCY  = 45    # lower = more frequent
+BAR_FREQUENCY  = 45    # n of frames until new bar is generated
 BAR_COLOUR     = GREEN
 BG_COLOUR      = BLUE
 MAX_BAR_LENGTH = 400
@@ -213,17 +213,26 @@ class Frame:
         self.__foreground = pygame.Surface(SCREEN_SIZE).convert()  # foreground
         self.__foreground.set_colorkey(BLACK)
 
+        self.font = pygame.font.SysFont('Comic Sans MS', 50)
+
+
     """
     Updates the foreground to represent the given barlist and bird 
     """
     def redraw_foreground(self, barlist, bird):
         self.__foreground.fill(BLACK)
         for pair in barlist.to_tuple():
-            self.__foreground.blit(pair.get_surface(), (pair.get_x(), 0))
+            self.__foreground.blit(pair.get_surface(),
+                                   (pair.get_x(), 0))
         pygame.draw.circle(self.__foreground,
                            bird.colour,
                            bird.get_pos(),
                            bird.radius)
+        self.__foreground.blit(self.font.render(str(barlist.n_bars_passed()),
+                                                True  ,
+                                                WHITE ),
+                               (SCREEN_WIDTH//2, 5))
+
 
     """
     Redraws the background and foreground onto the display
@@ -244,13 +253,20 @@ class Game:
         self.__bird  = Bird()
         self.__running = False
 
+    """
+    Checks whether game has received any input since the last frame. Also 
+    runs quit() if the user asked to quit since last frame 
+    """
     def __check_for_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.__running = False
+                self.quit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.__bird.jump()
 
+    """
+    Scrolls bars and handles gravity on bird for one frame
+    """
     def __handle_physics(self):
         self.__bird.next_frame()
         self.__bars.scroll()

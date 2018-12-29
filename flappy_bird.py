@@ -78,17 +78,17 @@ class BarPair:
     Returns True if any part of the bird is within the bounds of the top or 
     bottom bar (ie. if the bird is in collision with a bar), else False
     
-    Treats the bird as a square 
+    Treats the bird as a square with sides as long as the bird's radius
     """
     def detect_collision(self, bird):
-        # checks whether any part of the bird "square" contacts either of the
-        # bars
-        # This is as neat as I could make it look without going over 80 chars
-        if ((GROUND_LEVEL - self.__height - bird.radius) < bird.get_pos()[1]
-            or (GROUND_LEVEL - self.__height - BAR_GAP + bird.radius) >
-                        bird.get_pos()[1])\
-            and self.get_x()-bird.radius <= bird.get_pos()[0] \
-                                <= self.get_x()+ BAR_WIDTH +  bird.radius:
+        bottom_limit = GROUND_LEVEL - self.__height - bird.radius
+        top_limit = GROUND_LEVEL - self.__height - BAR_GAP + bird.radius
+        bird_x, bird_y = bird.get_pos()
+        if (bird_y > bottom_limit or bird_y < top_limit)     \
+            and                                              \
+                           self.get_x() - bird.radius        \
+                        <= bird_x                            \
+                        <= self.get_x() + BAR_WIDTH +  bird.radius:
             return True
         else:
             return False
@@ -222,9 +222,8 @@ class Frame:
 
         self.font = pygame.font.SysFont('Arial', 50)
 
-
     """
-    Updates the foreground to represent the given barlist and bird, 
+    Updates the foreground to represent the given BarList and bird, 
     and displays the score
     """
     def redraw_foreground(self, barlist, bird):

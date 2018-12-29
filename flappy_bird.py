@@ -220,18 +220,21 @@ class Frame:
     Updates the foreground to represent the given barlist and bird 
     """
     def redraw_foreground(self, barlist, bird):
-        self.__foreground.fill(BLACK)
+        self.__foreground.fill(BLACK)                  # erase foreground
         for pair in barlist.to_tuple():
-            self.__foreground.blit(pair.get_surface(),
+            self.__foreground.blit(pair.get_surface(), # draw bars
                                    (pair.get_x(), 0))
-        pygame.draw.circle(self.__foreground,
+        pygame.draw.circle(self.__foreground,          # draw bird
                            bird.colour,
                            bird.get_pos(),
                            bird.radius)
-        self.__foreground.blit(self.font.render(str(barlist.n_bars_passed()),
-                                                True  ,
-                                                WHITE ),
-                               (SCREEN_WIDTH//2, 5))
+                                                       # draw score
+        text_box = self.font.render(str(barlist.n_bars_passed()),
+                                    True,
+                                    WHITE)
+        text_x_location = SCREEN_WIDTH // 2 - text_box.get_width() // 2
+        self.__foreground.blit(text_box,
+                               (text_x_location, 5))
 
 
     """

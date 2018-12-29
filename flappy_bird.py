@@ -104,7 +104,8 @@ class BarPair:
         self.__x_pos -= SCROLL_RATE
 
 """
-A list of bars that appear on the screen at a given time; acts like a queue
+A list of bars that appear on the screen at a given time; acts like a queue. 
+Also keeps track of the number of bars successfully passed since it was created
 """
 class BarList:
     def __init__(self):
@@ -217,7 +218,8 @@ class Frame:
 
 
     """
-    Updates the foreground to represent the given barlist and bird 
+    Updates the foreground to represent the given barlist and bird, 
+    and displays the score
     """
     def redraw_foreground(self, barlist, bird):
         self.__foreground.fill(BLACK)                  # erase foreground

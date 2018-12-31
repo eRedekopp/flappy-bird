@@ -40,7 +40,7 @@ class Frame:
         self.__floor.fill(Frame.GREY)
         self.__background.blit(self.__floor, (0, Frame.GROUND_LEVEL))
 
-        self.__foreground = pygame.Surface(Frame.SIZE).convert()  # foreground
+        self.__foreground = pygame.Surface(Frame.SIZE).convert()
         self.__foreground.set_colorkey(Frame.BLANK)
 
         self.font = pygame.font.SysFont('Arial', 50)
@@ -136,13 +136,15 @@ class BarPair:
         bottom_bar_inside = pygame.Surface((BarPair.WIDTH - 4,
                                             height - 2))
 
-        bottom_bar.fill(Frame.BLACK) # create outlines
+        # create both bars with 2-px black outlines
+        bottom_bar.fill(Frame.BLACK)
         bottom_bar_inside.fill(BarPair.COLOUR)
         bottom_bar.blit(bottom_bar_inside, (2, 2))
         top_bar.fill(Frame.BLACK)
         top_bar_inside.fill(BarPair.COLOUR)
         top_bar.blit(top_bar_inside, (2, 0))
 
+        # blit onto main surface
         surface.blit(top_bar, (0, 0))
         surface.blit(bottom_bar, (0, Frame.GROUND_LEVEL - height))
         return surface.convert(), height
@@ -161,7 +163,7 @@ class BarPair:
     Returns True if any part of the bird is within the bounds of the top or 
     bottom bar (ie. if the bird is in collision with a bar), else False
     
-    Treats the bird as a square with sides as long as the bird's radius
+    Treats the bird as a square with sides as long as the bird's radius * 2
     """
     def detect_collision(self, bird):
         bottom_limit = Frame.GROUND_LEVEL - self.__height - bird.RADIUS
@@ -360,7 +362,7 @@ class Game:
     """
     Begins a game. Loops until the game is over or the user presses the x 
     button on the frame, then displays the game over screen until the user 
-    exits, or presses Enter to start a new game.
+    exits
     """
     def run(self):
         self.__running = True

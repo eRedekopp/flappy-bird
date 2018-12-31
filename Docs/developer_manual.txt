@@ -23,8 +23,8 @@ Physics:
     right, rather the bars scroll to the left.
 
     Collision detection treats the bird as a square with sides equal to the
-    bird's radius, and detects a collision if there is any overlap between the
-    bird's "square" and any of the bars on the screen
+    bird's radius * 2, and detects a collision if there is any overlap between
+    the bird's "square" and any of the bars on the screen
 
 Scoring:
 
@@ -36,7 +36,8 @@ Graphics:
 
     All graphics are handled within the Frame class, which is a very simple
     implementation which uses the pygame display. It is worth noting that a
-    BarPair stores its own graphical representation as a pygame.Surface.
+    BarPair or a Bird stores its own graphical representation as a
+    pygame.Surface.
 
     The background contains the blue sky and the grey ground, and is never
     edited after the Frame is initialized. The foreground is fully erased and

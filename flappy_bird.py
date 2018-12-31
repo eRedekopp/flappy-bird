@@ -290,13 +290,16 @@ class Bird:
     Adjust position and velocity for one frame
     """
     def next_frame(self):
+        # stop falling if on ground
         if self.__y >= Frame.GROUND_LEVEL - self.RADIUS \
                 and self.__y_velocity > 0:
             self.__y_velocity = 0
             self.__y = Frame.GROUND_LEVEL - self.RADIUS
+        # else, apply gravity
         elif self.__y_velocity < Game.MAX_Y_VELOCITY \
                 and self.__y < Frame.GROUND_LEVEL - self.RADIUS:
             self.__y_velocity += Game.GRAVITY
+        # finally, adjust bird position
         self.__y += int(self.__y_velocity)
 
     """

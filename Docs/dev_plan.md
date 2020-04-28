@@ -51,7 +51,9 @@ Keeps track of the player's score and displays it at the end of the game
 Aesthetic changes as desired, smooth out entrance and exit of bars on
 screen
 
-### Phase 10
+### Phase 10: Skipped
 
 Use machine learning to automatically play the game (exact steps TBD)
+
+-> Learned a lot more about AI over the past year since I started this project which honestly made me realize that dumping a ton of time into learning reinforcement learning techniques just didn't seem like what I wanted to do; moved onto other projects instead. Still had a very fun time writing this game, though.
 
